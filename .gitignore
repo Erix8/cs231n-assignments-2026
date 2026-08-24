@@ -1,0 +1,22 @@
+.DS_Store
+__pycache__/
+.ipynb_checkpoints/
+
+# downloaded datasets / pretrained models (large, keep off git)
+assignment*/cs231n/datasets/cifar-10-batches-py/
+assignment*/cs231n/datasets/coco_captioning/
+assignment*/cs231n/datasets/*.tar.gz
+assignment*/cs231n/datasets/*.npz
+assignment*/cs231n/datasets/*.pt
+assignment3/data/
+assignment3/pretrained_model/
+assignment3/cs231n/exp/
+assignment3/results/
+
+# submission build artifacts
+assignment*/cs231n/saved/
+*.so
+a1_code_submission.zip
+a2_code_submission.zip
+a3_code_submission.zip
+a*_inline_submission.pdf
