@@ -6,7 +6,7 @@ This repo is **local-first & Colab-free** — every notebook is patched to run s
 
 For official course stuff (schedule, lectures, assignment overviews), check out the [cs231n website].
 
-[cs231n website]: https://cs231n.stanford.edu
+[cs231n website]: https://cs231n.stanford.edu/2026
 
 ## 🗂️ Assignment Contents
 
