@@ -1,6 +1,6 @@
 # 🎯 Assignment 1 — Image Classification & Neural Nets
 
-> 🚦 **Status:** ✅✅✅⬜⬜ 3 / 5 done — kNN, Softmax & Two-layer net ticked off! 🏁
+> 🚦 **Status:** ✅✅✅✅⬜ 4 / 5 done — kNN, Softmax, Two-layer net & Features ticked off! 🏁
 
 The classic entry point into computer vision. 🖼️ No fancy frameworks, no GPU — just me, NumPy, and a
 whole lot of vectorization. By the end I want to *feel* the full image-classification pipeline: from a
@@ -14,7 +14,7 @@ real multi-layer neural net trained with backprop. 💪
 | 1 | [`knn.ipynb`] | kNN: naive loops → fully vectorized; cross-validate `k` | ✅ |
 | 2 | [`softmax.ipynb`] | Softmax loss + gradient (vectorized), train on CIFAR-10 | ✅ |
 | 3 | [`two_layer_net.ipynb`] | Two-layer net forward/backward + gradient check + train | ✅ |
-| 4 | [`features.ipynb`] | HOG + color-histogram features vs raw pixels 📊 | ⬜ |
+| 4 | [`features.ipynb`] | HOG + color-histogram features vs raw pixels 📊 | ✅ |
 | 5 | [`FullyConnectedNets.ipynb`] | Deep FC nets: affine/ReLU, SGD+Momentum/RMSProp/Adam, dropout, batch/layer norm | ⬜ |
 
 [`knn.ipynb`]: ./knn.ipynb
@@ -49,6 +49,12 @@ real multi-layer neural net trained with backprop. 💪
 - Default solver (hidden 50, lr 1e-3, 10 epochs) already hit ~51% val — the 36% bar was easy.
 - Tuned grid (lr × reg × hidden, 15 epochs) → best val **54.9%** @ lr=1e-3, reg=0.25, hidden=200; test **53.4%**.
 
+**Features** ✅
+- Features = HOG (144-d: 9 orientations × 4×4 cells) + hue colour histogram (25-d) → **169-d**, then standardized.
+- Softmax on features: best val **52.7%** @ lr=1e-1, reg=1e-3; test **51.0%** (raw-pixel softmax was only 37.6% val → features help a lot!).
+- Two-layer net on features: best val **61.6%** @ lr=1.5e-1, reg=1e-4; test **60.0%**.
+- Misclassified images are mostly visually similar pairs (plane/ship, car/truck, cat/dog…).
+
 ## 📊 Scoreboard
 
 | Exercise | Target / result | Got? |
@@ -56,8 +62,8 @@ real multi-layer neural net trained with backprop. 💪
 | kNN (best k=10 via CV) | **28.2%** test accuracy on CIFAR-10 (k=1: 27.4%) | ✅ |
 | Softmax | **35.5%** test accuracy (best val **37.6%** @ lr=1e-7, reg=1e4) | ✅ |
 | Two-layer net | **53.4%** test accuracy (best val **54.9%** @ lr=1e-3, reg=0.25, hidden=200) | ✅ |
-| Features + linear | ~50%+ (features beat raw pixels!) | 🔜 |
-| Best FC net | ≥50% validation accuracy (the assignment bar) | 🔜 |
+| Features + linear | **51.0%** test (Softmax on features; raw pixels only got 35.5%) | ✅ |
+| NN on features | **60.0%** test (best val **61.6%** @ lr=1.5e-1, reg=1e-4) | ✅ |
 
 ## 🛩️ Blast off
 
