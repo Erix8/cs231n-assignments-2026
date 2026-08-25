@@ -1,6 +1,6 @@
 # 🎯 Assignment 1 — Image Classification & Neural Nets
 
-> 🚦 **Status:** ⬜⬜⬜⬜⬜ Not started yet — hoping to tick these off one by one! 🏁
+> 🚦 **Status:** ✅✅✅⬜⬜ 3 / 5 done — kNN, Softmax & Two-layer net ticked off! 🏁
 
 The classic entry point into computer vision. 🖼️ No fancy frameworks, no GPU — just me, NumPy, and a
 whole lot of vectorization. By the end I want to *feel* the full image-classification pipeline: from a
@@ -11,11 +11,17 @@ real multi-layer neural net trained with backprop. 💪
 
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
-| 1 | `knn.ipynb` | kNN: naive loops → fully vectorized; cross-validate `k` | ⬜ |
-| 2 | `softmax.ipynb` | Softmax loss + gradient (vectorized), train on CIFAR-10 | ⬜ |
-| 3 | `two_layer_net.ipynb` | Two-layer net forward/backward + gradient check + train | ⬜ |
-| 4 | `features.ipynb` | HOG + color-histogram features vs raw pixels 📊 | ⬜ |
-| 5 | `FullyConnectedNets.ipynb` | Deep FC nets: affine/ReLU, SGD+Momentum/RMSProp/Adam, dropout, batch/layer norm | ⬜ |
+| 1 | [`knn.ipynb`] | kNN: naive loops → fully vectorized; cross-validate `k` | ✅ |
+| 2 | [`softmax.ipynb`] | Softmax loss + gradient (vectorized), train on CIFAR-10 | ✅ |
+| 3 | [`two_layer_net.ipynb`] | Two-layer net forward/backward + gradient check + train | ✅ |
+| 4 | [`features.ipynb`] | HOG + color-histogram features vs raw pixels 📊 | ⬜ |
+| 5 | [`FullyConnectedNets.ipynb`] | Deep FC nets: affine/ReLU, SGD+Momentum/RMSProp/Adam, dropout, batch/layer norm | ⬜ |
+
+[`knn.ipynb`]: ./knn.ipynb
+[`softmax.ipynb`]: ./softmax.ipynb
+[`two_layer_net.ipynb`]: ./two_layer_net.ipynb
+[`features.ipynb`]: ./features.ipynb
+[`FullyConnectedNets.ipynb`]: ./FullyConnectedNets.ipynb
 
 ## 🔑 Ideas I'm chasing
 
@@ -26,15 +32,30 @@ real multi-layer neural net trained with backprop. 💪
 
 ## 💭 Notes & takeaways
 
-*(To be written as I go — mistakes, "aha" moments, and gotchas.)*
+**kNN** ✅
+- Double-loop → single-loop → no-loop (matmul + two broadcasts): no-loop is **~140×** faster.
+- Bright rows/columns in the distance matrix = images far from *all* of the other set (outliers).
+- Cross-validation over `k ∈ {1,3,5,8,10,12,15,20,50,100}` picked **k=10** → 28.2% on test.
+
+**Softmax** ✅
+- Gradient is `Xᵀ(p − one_hot)/N + 2·reg·W`; gradcheck passed at ~1e-7 relative error.
+- Vectorized loss+grad **~27×** faster than the naive loop.
+- Tuned `lr × reg` (num_iters=2000) → best val **37.6%** @ lr=1e-7, reg=1e4; test **35.5%**.
+- Learned weights = blurry class-average templates (first-order stats only).
+
+**Two-layer net** ✅
+- Modular layers: `affine` / `relu` / `softmax_loss` each with forward+backward; all gradchecks ≤1e-7.
+- Architecture: affine→ReLU→affine→softmax, reg loss uses 0.5·λ·ΣW² (Solver handled the SGD loop).
+- Default solver (hidden 50, lr 1e-3, 10 epochs) already hit ~51% val — the 36% bar was easy.
+- Tuned grid (lr × reg × hidden, 15 epochs) → best val **54.9%** @ lr=1e-3, reg=0.25, hidden=200; test **53.4%**.
 
 ## 📊 Scoreboard
 
 | Exercise | Target / result | Got? |
 |----------|-----------------|------|
-| kNN (k=7) | ~27% test accuracy on CIFAR-10 | 🔜 |
-| Softmax | ~35%+ test accuracy | 🔜 |
-| Two-layer net | ~48–50% test accuracy | 🔜 |
+| kNN (best k=10 via CV) | **28.2%** test accuracy on CIFAR-10 (k=1: 27.4%) | ✅ |
+| Softmax | **35.5%** test accuracy (best val **37.6%** @ lr=1e-7, reg=1e4) | ✅ |
+| Two-layer net | **53.4%** test accuracy (best val **54.9%** @ lr=1e-3, reg=0.25, hidden=200) | ✅ |
 | Features + linear | ~50%+ (features beat raw pixels!) | 🔜 |
 | Best FC net | ≥50% validation accuracy (the assignment bar) | 🔜 |
 
