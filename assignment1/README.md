@@ -1,6 +1,6 @@
 # 🎯 Assignment 1 — Image Classification & Neural Nets
 
-> 🚦 **Status:** ✅✅✅✅⬜ 4 / 5 done — kNN, Softmax, Two-layer net & Features ticked off! 🏁
+> 🚦 **Status:** ✅✅✅✅✅ **5 / 5 — Assignment 1 COMPLETE!** 🎉🏁
 
 The classic entry point into computer vision. 🖼️ No fancy frameworks, no GPU — just me, NumPy, and a
 whole lot of vectorization. By the end I want to *feel* the full image-classification pipeline: from a
@@ -15,7 +15,7 @@ real multi-layer neural net trained with backprop. 💪
 | 2 | [`softmax.ipynb`] | Softmax loss + gradient (vectorized), train on CIFAR-10 | ✅ |
 | 3 | [`two_layer_net.ipynb`] | Two-layer net forward/backward + gradient check + train | ✅ |
 | 4 | [`features.ipynb`] | HOG + color-histogram features vs raw pixels 📊 | ✅ |
-| 5 | [`FullyConnectedNets.ipynb`] | Deep FC nets: affine/ReLU, SGD+Momentum/RMSProp/Adam, dropout, batch/layer norm | ⬜ |
+| 5 | [`FullyConnectedNets.ipynb`] | Deep FC nets: affine/ReLU, SGD+Momentum/RMSProp/Adam, dropout, batch/layer norm | ✅ |
 
 [`knn.ipynb`]: ./knn.ipynb
 [`softmax.ipynb`]: ./softmax.ipynb
@@ -32,28 +32,31 @@ real multi-layer neural net trained with backprop. 💪
 
 ## 💭 Notes & takeaways
 
-**kNN** ✅
-- Double-loop → single-loop → no-loop (matmul + two broadcasts): no-loop is **~140×** faster.
-- Bright rows/columns in the distance matrix = images far from *all* of the other set (outliers).
-- Cross-validation over `k ∈ {1,3,5,8,10,12,15,20,50,100}` picked **k=10** → 28.2% on test.
+**Big picture: more capacity → higher ceiling** 📈
+kNN ~28% 😴 → softmax ~36% 😐 → 2-layer net ~53% 😎
+Each step is a *qualitative* jump, not just a bigger model 🚀
 
-**Softmax** ✅
-- Gradient is `Xᵀ(p − one_hot)/N + 2·reg·W`; gradcheck passed at ~1e-7 relative error.
-- Vectorized loss+grad **~27×** faster than the naive loop.
-- Tuned `lr × reg` (num_iters=2000) → best val **37.6%** @ lr=1e-7, reg=1e4; test **35.5%**.
-- Learned weights = blurry class-average templates (first-order stats only).
+**Memorize ≠ Learn** 🧠
+- kNN is lazy AF 🛋️: never trains, just measures distances on the fly (vectorize it → **~140×** faster 🏎️, but still brute force)
+- Cross-validating `k` only squeezes it to 28% — no real learning
+- A linear classifier does "distill" each class into one template 👻 → but they're just blurry class-averages (first-order stats only)
 
-**Two-layer net** ✅
-- Modular layers: `affine` / `relu` / `softmax_loss` each with forward+backward; all gradchecks ≤1e-7.
-- Architecture: affine→ReLU→affine→softmax, reg loss uses 0.5·λ·ΣW² (Solver handled the SGD loop).
-- Default solver (hidden 50, lr 1e-3, 10 epochs) already hit ~51% val — the 36% bar was easy.
-- Tuned grid (lr × reg × hidden, 15 epochs) → best val **54.9%** @ lr=1e-3, reg=0.25, hidden=200; test **53.4%**.
+**Raw pixels are expensive** 💸
+- Linear model on raw pixels: ~36%, 'cause it can't decide *what* to look at 🤷
+- Same model + hand-crafted HOG/color features → **~51%** ✨ the features do the heavy lifting, not the model
+- Let the *net* decide → a single hidden layer on raw pixels ~53%, already beats "features + linear" 🎉
+- Learnt + hand-crafted features together → **~60%** 🏆
+- TL;DR: feature *learning* > feature *engineering* 💡
 
-**Features** ✅
-- Features = HOG (144-d: 9 orientations × 4×4 cells) + hue colour histogram (25-d) → **169-d**, then standardized.
-- Softmax on features: best val **52.7%** @ lr=1e-1, reg=1e-3; test **51.0%** (raw-pixel softmax was only 37.6% val → features help a lot!).
-- Two-layer net on features: best val **61.6%** @ lr=1.5e-1, reg=1e-4; test **60.0%**.
-- Misclassified images are mostly visually similar pairs (plane/ship, car/truck, cat/dog…).
+**Craft tips** 🔧
+- Vectorization is a lifestyle 🏎️ (kNN ~140×, softmax ~27× — usually clearer too)
+- Backprop is modular & reliable: affine/relu/softmax each carry forward+backward, just stack 'em, gradcheck stays ≤1e-7 ✅
+
+**Deep nets flip the tuning game** 🎛️
+- Only 50 tiny images? 100% in 20 epochs 😅 — fitting was never the problem
+- Deeper = way more sensitive to `weight_scale` (activations/gradients compound per layer) ⚠️
+- "Just pick a good lr" ain't enough: momentum / RMSProp / Adam each fix different issues 💊
+- Best: `[200,200]` + Adam + sane ws/reg → **56.6% val**, ~53% test 🎯 (clears the 50% bar)
 
 ## 📊 Scoreboard
 
@@ -64,6 +67,7 @@ real multi-layer neural net trained with backprop. 💪
 | Two-layer net | **53.4%** test accuracy (best val **54.9%** @ lr=1e-3, reg=0.25, hidden=200) | ✅ |
 | Features + linear | **51.0%** test (Softmax on features; raw pixels only got 35.5%) | ✅ |
 | NN on features | **60.0%** test (best val **61.6%** @ lr=1.5e-1, reg=1e-4) | ✅ |
+| Best FC net | **52.6%** test / **56.6%** val @ `[200,200]`, Adam, reg 0.01 (bar: 50%) | ✅ |
 
 ## 🛩️ Blast off
 
@@ -78,16 +82,27 @@ real multi-layer neural net trained with backprop. 💪
 
 | File | What it is |
 |------|-----------|
-| `cs231n/classifiers/k_nearest_neighbor.py` | my kNN 🗂️ |
-| `cs231n/classifiers/linear_classifier.py` | SVM & Softmax live here 📐 |
-| `cs231n/classifiers/softmax.py` | softmax, by hand |
-| `cs231n/classifiers/fc_net.py` | the deep net 🕸️ |
-| `cs231n/layers.py` | affine / ReLU / softmax primitives |
-| `cs231n/optim.py` | SGD(+momentum) / RMSProp / Adam |
-| `cs231n/solver.py` | the training loop, abstracted |
-| `cs231n/features.py` | HOG + color histogram extractors |
-| `cs231n/data_utils.py` | CIFAR-10 loader |
-| `collect_submission.ipynb` | 📦 zip + PDF for submission |
+| [`cs231n/classifiers/k_nearest_neighbor.py`] | my kNN 🗂️ |
+| [`cs231n/classifiers/linear_classifier.py`] | SVM & Softmax live here 📐 |
+| [`cs231n/classifiers/softmax.py`] | softmax, by hand |
+| [`cs231n/classifiers/fc_net.py`] | the deep net 🕸️ |
+| [`cs231n/layers.py`] | affine / ReLU / softmax primitives |
+| [`cs231n/optim.py`] | SGD(+momentum) / RMSProp / Adam |
+| [`cs231n/solver.py`] | the training loop, abstracted |
+| [`cs231n/features.py`] | HOG + color histogram extractors |
+| [`cs231n/data_utils.py`] | CIFAR-10 loader |
+| [`collect_submission.ipynb`] | 📦 zip + PDF for submission |
+
+[`cs231n/classifiers/k_nearest_neighbor.py`]: ./cs231n/classifiers/k_nearest_neighbor.py
+[`cs231n/classifiers/linear_classifier.py`]: ./cs231n/classifiers/linear_classifier.py
+[`cs231n/classifiers/softmax.py`]: ./cs231n/classifiers/softmax.py
+[`cs231n/classifiers/fc_net.py`]: ./cs231n/classifiers/fc_net.py
+[`cs231n/layers.py`]: ./cs231n/layers.py
+[`cs231n/optim.py`]: ./cs231n/optim.py
+[`cs231n/solver.py`]: ./cs231n/solver.py
+[`cs231n/features.py`]: ./cs231n/features.py
+[`cs231n/data_utils.py`]: ./cs231n/data_utils.py
+[`collect_submission.ipynb`]: ./collect_submission.ipynb
 
 ---
 

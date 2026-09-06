@@ -12,7 +12,7 @@ For official course stuff (schedule, lectures, assignment overviews), check out 
 
 | # | Assignment | Progress |
 |---|------------|----------|
-| 1 | [Image Classification, kNN, Softmax, Fully-Connected Neural Network, Fully-Connected Nets 🔍](./assignment1/README.md) | ⬜ Not started |
+| 1 | [Image Classification, kNN, Softmax, Fully-Connected Neural Network, Fully-Connected Nets 🔍](./assignment1/README.md) | ✅ **Completed** — 5/5 notebooks (28.2% → 56.6%) |
 | 2 | [Batch Normalization, Dropout, Convolutional Nets, Network Visualization, Image Captioning with RNNs 🧱](./assignment2/README.md) | ⬜ Not started |
 | 3 | [Image Captioning with Transformers, Self-Supervised Learning, Diffusion Models, CLIP and DINO Models ✨](./assignment3/README.md) | ⬜ Not started |
 
