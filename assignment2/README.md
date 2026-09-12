@@ -26,7 +26,35 @@ describe pictures in words. 🖼️➡️💬
 
 ## 💭 Notes & takeaways
 
-*(To be written as I go — e.g. the moving-average gotcha in BatchNorm eval mode.)*
+**BatchNorm: speed is the headline, robustness is the story** 🎛️
+- Trains faster (train 0.79 vs 0.71 @ 10 epochs) — but the real win is weight-init robustness: the baseline only learns in a narrow `weight_scale ≈ 1e-2..5e-2` window, BN works from ~1e-2 all the way to ~1e0 🛡️
+- The eval-mode gotcha ⚠️: training normalizes with *batch* stats, testing with the *running averages* — that's the whole reason `running_mean`/`running_var` exist, and forgetting them quietly tanks accuracy
+- It's batch-size dependent: tiny batches give noisy mean/var → bs 5 < 10 < 50 📉
+- LayerNorm is the batch-free fix (normalize per data point, train ≡ test) — but it dies when the *feature* dim is tiny: same failure mode, other axis 🔁
+
+**Dropout: a cheap ensemble, not free** 🎲
+- Inverted dropout's `/p` keeps the expected activation scale identical at train and test — drop it and test-time activations are `1/p` too big
+- 500 imgs: no-dropout train **0.92** / val **0.26** → dropout(0.25) train **0.90** / val **0.31** → smaller train/val gap, slightly lower train acc 🛡️
+- It buys generalization by spending training accuracy — worth it only when you're actually overfitting
+
+**Convs: identical math, ~500× the speed** ⚡
+- Naive conv/pool are just nested loops; Cython im2col gives **427×** (conv fwd), **765×** (conv bwd) and **~56×** (pooling) 🏎️
+- "Spatial" BN is literally vanilla BN with the channel axis moved last; group norm is LayerNorm over a `(N·G, C/G·H·W)` reshape — same formula, different fold
+
+**PyTorch: the abstraction ladder** 🪜
+- barebones tensors (43% / 49%) → `nn.Module` (47%) → `nn.Sequential` (57%): same net, less code on every rung
+- Part V big win 🏆: VGG-style + BN + **global-average-pool** (ditch the giant FC) + dropout + augmentation + cosine-annealed Adam → **88.8% val / 87.4% test in 10 epochs** (bar was 70%)
+- BN + GAP + a sane LR schedule did more than any amount of architecture fiddling
+
+**RNNs: overfit in a blink, generalize never** 🖼️➡️💬
+- 50 images → loss **80 → 0.013** in 100 iterations; train captions come back *verbatim*, val captions are word salad 🥗 — exactly the memorization the notebook predicts
+- My LSTM matched `torch.nn.LSTM` to **3.8e-16** once I mapped PyTorch's `i,f,g,o` gate order onto cs231n's `i,f,o,g` 🎯
+- Word-level vs char-level: a few dozen tokens (tiny vocab, open vocabulary, no `<UNK>`) vs much longer sequences that are harder to learn 📝
+
+**Craft tips** 🔧
+- Gradient-check every hand-written layer before trusting a training run — everything here stayed ≤1e-6 ✅
+- A captioning model behaves differently at train vs test: feed ground truth vs sample your own words
+- ~17% of the 2014 Flickr URLs are dead 🖼️ — guard `image_from_url` with a `None` check before `imshow`
 
 ## 📊 Scoreboard
 
@@ -49,9 +77,9 @@ describe pictures in words. 🖼️➡️💬
    ```bash
    python setup.py build_ext --inplace
    ```
-5. Apple Silicon tip: switch the device line to `mps` for a speed boost 🍎⚡
+5. Device is auto-detected: the PyTorch notebook uses `mps` when it's available and falls back to CPU otherwise — nothing to configure 🍎⚡
 
-> ⚠️ The captioning notebook trains an RNN — nice on GPU, slow on CPU. If it drags, that's the cue to rent a GPU box. 🚀
+> 💻 Everything here ran **locally, with no GPU rental** — just hit run. The captioning notebook trains its RNN in a couple of minutes. 🚀
 
 ## 🗂️ Treasure map
 
