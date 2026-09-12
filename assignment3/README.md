@@ -10,10 +10,10 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
-| 1 | `Transformer_Captioning.ipynb` | Transformer captioner: multi-head attention, positional encodings, train on COCO 🤖 | ⬜ |
-| 2 | `Self_Supervised_Learning.ipynb` | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | ⬜ |
+| 1 | `TransformerCaptioning.ipynb` | Transformer captioner: multi-head attention, positional encodings, train on COCO 🤖 | ⬜ |
+| 2 | `SelfSupervisedLearning.ipynb` | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | ⬜ |
 | 3 | `DDPM.ipynb` | Text-conditioned diffusion: forward/reverse processes, U-Net, train or load pretrained ✨ | ⬜ |
-| 4 | `CLIP_DINO.ipynb` | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ⬜ |
+| 4 | `CLIPDINO.ipynb` | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ⬜ |
 
 ## 🔑 Ideas I'm chasing
 
@@ -41,7 +41,7 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 2. Open this folder in VS Code (or `cd assignment3 && jupyter notebook`).
 3. Run the **first cell** — COCO / imagenet_val / emoji datasets auto-download as needed. ⬇️
 4. Pretrained weights (SimCLR, DDPM) fetch themselves on first use. 🤖
-5. `CLIP_DINO.ipynb` needs `tensorflow` + `tensorflow-datasets` (DAVIS video) — already in the env. 🎥
+5. `CLIPDINO.ipynb` needs `tensorflow` + `tensorflow-datasets` (DAVIS video) — already in the env. 🎥
 
 > ⚠️ Training parts really want a GPU. On a Mac, `mps` helps; for DDPM, just `git clone` this repo onto
 > a rented GPU box (e.g. AutoDL) — everything is local-ready. 🚀

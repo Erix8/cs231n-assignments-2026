@@ -11,16 +11,16 @@ real multi-layer neural net trained with backprop. 💪
 
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
-| 1 | [`knn.ipynb`] | kNN: naive loops → fully vectorized; cross-validate `k` | ✅ |
-| 2 | [`softmax.ipynb`] | Softmax loss + gradient (vectorized), train on CIFAR-10 | ✅ |
-| 3 | [`two_layer_net.ipynb`] | Two-layer net forward/backward + gradient check + train | ✅ |
-| 4 | [`features.ipynb`] | HOG + color-histogram features vs raw pixels 📊 | ✅ |
+| 1 | [`kNN.ipynb`] | kNN: naive loops → fully vectorized; cross-validate `k` | ✅ |
+| 2 | [`Softmax.ipynb`] | Softmax loss + gradient (vectorized), train on CIFAR-10 | ✅ |
+| 3 | [`TwoLayerNet.ipynb`] | Two-layer net forward/backward + gradient check + train | ✅ |
+| 4 | [`Features.ipynb`] | HOG + color-histogram features vs raw pixels 📊 | ✅ |
 | 5 | [`FullyConnectedNets.ipynb`] | Deep FC nets: affine/ReLU, SGD+Momentum/RMSProp/Adam, dropout, batch/layer norm | ✅ |
 
-[`knn.ipynb`]: ./knn.ipynb
-[`softmax.ipynb`]: ./softmax.ipynb
-[`two_layer_net.ipynb`]: ./two_layer_net.ipynb
-[`features.ipynb`]: ./features.ipynb
+[`kNN.ipynb`]: ./kNN.ipynb
+[`Softmax.ipynb`]: ./Softmax.ipynb
+[`TwoLayerNet.ipynb`]: ./TwoLayerNet.ipynb
+[`Features.ipynb`]: ./Features.ipynb
 [`FullyConnectedNets.ipynb`]: ./FullyConnectedNets.ipynb
 
 ## 🔑 Ideas I'm chasing

@@ -22,17 +22,17 @@ CODE=(
 )
 
 NOTEBOOKS=(
-	"Transformer_Captioning.ipynb"
-	"Self_Supervised_Learning.ipynb"
+	"TransformerCaptioning.ipynb"
+	"SelfSupervisedLearning.ipynb"
 	"DDPM.ipynb"
-	"CLIP_DINO.ipynb"
+	"CLIPDINO.ipynb"
 )
 
 PDFS=(
-  	"Transformer_Captioning.ipynb"
-	"Self_Supervised_Learning.ipynb"
+  	"TransformerCaptioning.ipynb"
+	"SelfSupervisedLearning.ipynb"
 	"DDPM.ipynb"
-	"CLIP_DINO.ipynb"
+	"CLIPDINO.ipynb"
 )
 
 FILES=( "${CODE[@]}" "${NOTEBOOKS[@]}" )

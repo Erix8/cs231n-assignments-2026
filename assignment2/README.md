@@ -15,7 +15,7 @@ describe pictures in words. 🖼️➡️💬
 | 2 | [`Dropout.ipynb`](Dropout.ipynb) | Dropout forward/backward from scratch (inverted dropout) | ✅ |
 | 3 | [`ConvolutionalNetworks.ipynb`](ConvolutionalNetworks.ipynb) | Conv/pool layers, spatial BatchNorm, group norm, Cython fast layers ⚙️ | ⬜ |
 | 4 | [`PyTorch.ipynb`](PyTorch.ipynb) | PyTorch warm-up: two-layer net, BatchNorm, Dropout, ConvNet, model visualization | ⬜ |
-| 5 | [`RNN_Captioning_pytorch.ipynb`](RNN_Captioning_pytorch.ipynb) | Image captioning with RNN/LSTM on COCO 🖼️➡️💬 | ⬜ |
+| 5 | [`RNNCaptioning.ipynb`](RNNCaptioning.ipynb) | Image captioning with RNN/LSTM on COCO 🖼️➡️💬 | ⬜ |
 
 ## 🔑 Ideas I'm chasing
 

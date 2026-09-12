@@ -8,6 +8,8 @@ assignment*/cs231n/datasets/coco_captioning/
 assignment*/cs231n/datasets/*.tar.gz
 assignment*/cs231n/datasets/*.npz
 assignment*/cs231n/datasets/*.pt
+assignment*/cs231n/im2col_cython.c
+assignment*/cs231n/build/
 assignment3/data/
 assignment3/pretrained_model/
 assignment3/cs231n/exp/

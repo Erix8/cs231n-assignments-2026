@@ -20,7 +20,7 @@ NOTEBOOKS=(
 	"Dropout.ipynb"
 	"ConvolutionalNetworks.ipynb"
 	"PyTorch.ipynb"
-  "RNN_Captioning_pytorch.ipynb"
+  "RNNCaptioning.ipynb"
 )
 FILES=( "${CODE[@]}" "${NOTEBOOKS[@]}" )
 

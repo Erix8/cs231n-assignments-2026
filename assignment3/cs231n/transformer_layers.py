@@ -30,7 +30,7 @@ class PositionalEncoding(nn.Module):
         pe = torch.zeros(1, max_len, embed_dim)
         ############################################################################
         # TODO: Construct the positional encoding array as described in            #
-        # Transformer_Captioning.ipynb.  The goal is for each row to alternate     #
+        # TransformerCaptioning.ipynb.  The goal is for each row to alternate      #
         # sine and cosine, and have exponents of 0, 0, 2, 2, 4, 4, etc. up to      #
         # embed_dim. Of course this exact specification is somewhat arbitrary, but #
         # this is what the autograder is expecting. For reference, our solution is #
@@ -143,7 +143,7 @@ class MultiHeadAttention(nn.Module):
         output = torch.empty((N, S, E))
         ############################################################################
         # TODO: Implement multiheaded attention using the equations given in       #
-        # Transformer_Captioning.ipynb.                                            #
+        # TransformerCaptioning.ipynb.                                             #
         # A few hints:                                                             #
         #  1) You'll want to split your shape from (N, T, E) into (N, T, H, E/H),  #
         #     where H is the number of heads.                                      #

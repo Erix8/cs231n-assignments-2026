@@ -17,10 +17,10 @@ CODE=(
 # that the generated pdf is
 # in order of questions
 NOTEBOOKS=(
-	"knn.ipynb"
-	"softmax.ipynb"
-	"two_layer_net.ipynb"
-	"features.ipynb"
+	"kNN.ipynb"
+	"Softmax.ipynb"
+	"TwoLayerNet.ipynb"
+	"Features.ipynb"
 	"FullyConnectedNets.ipynb"
 )
 
