@@ -1,6 +1,6 @@
 # 🧱 Assignment 2 — ConvNets, Normalization & Captioning
 
-> 🚦 **Status:** ✅⬜⬜⬜⬜ **1 / 5 — BatchNorm down.** Dropout is up next. 🎛️
+> 🚦 **Status:** ✅✅⬜⬜⬜ **2 / 5 — BatchNorm + Dropout down.** Conv/pool is up next. 🧱
 
 Assignment 1 was hand-rolled NumPy; now we go **deep and convolutional** — and meet **PyTorch** for the
 first time. The star of the show: understanding *why* BatchNorm and Dropout make training so much
@@ -12,7 +12,7 @@ describe pictures in words. 🖼️➡️💬
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
 | 1 | [`BatchNormalization.ipynb`](BatchNormalization.ipynb) | BatchNorm forward/backward from scratch (FC + conv), train vs eval mode | ✅ |
-| 2 | [`Dropout.ipynb`](Dropout.ipynb) | Dropout forward/backward from scratch (inverted dropout) | ⬜ |
+| 2 | [`Dropout.ipynb`](Dropout.ipynb) | Dropout forward/backward from scratch (inverted dropout) | ✅ |
 | 3 | [`ConvolutionalNetworks.ipynb`](ConvolutionalNetworks.ipynb) | Conv/pool layers, spatial BatchNorm, group norm, Cython fast layers ⚙️ | ⬜ |
 | 4 | [`PyTorch.ipynb`](PyTorch.ipynb) | PyTorch warm-up: two-layer net, BatchNorm, Dropout, ConvNet, model visualization | ⬜ |
 | 5 | [`RNN_Captioning_pytorch.ipynb`](RNN_Captioning_pytorch.ipynb) | Image captioning with RNN/LSTM on COCO 🖼️➡️💬 | ⬜ |
@@ -33,6 +33,7 @@ describe pictures in words. 🖼️➡️💬
 | Exercise | Target / result | Got? |
 |----------|-----------------|------|
 | BatchNorm vs no-BatchNorm | BN trains faster + more stable — train 0.79 vs 0.71 @ 10 epochs, and far more robust to weight-init scale | ✅ |
+| Dropout as regularizer | smaller train/val gap than no-dropout — val 0.31 vs 0.26, train 0.90 vs 0.92 | ✅ |
 | ConvNet on CIFAR-10 | ~75%+ validation accuracy | 🔜 |
 | RNN captioning | loss dropping + captions that make sense | 🔜 |
 
