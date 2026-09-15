@@ -1,18 +1,19 @@
 # ✨ Assignment 3 — Transformers, Self-Supervision & Generative Models
 
-> 🚦 **Status:** ✅🟨✅✅ **3 / 4 done + exercise 2 code-complete — only the SimCLR training runs are left.** ⏳
+> 🚦 **Status:** ✅✅✅✅ **4 / 4 — Assignment 3 COMPLETE!** 🎉🏁
 
 Modern deep learning in one assignment: **attention**, **self-supervised learning**, **diffusion**, and
-**vision-language models**. This is where the magic I've been reading about actually happens. 🥵 The good
-news: attention, diffusion and CLIP/DINO all ran **locally on CPU** — only SimCLR's contrastive
-pretraining is the part that really wants a GPU.
+**vision-language models**. This is where the magic I've been reading about actually happens. 🥵 And it
+turned out to be a laptop-friendly assignment: attention, diffusion and CLIP/DINO all ran locally on CPU,
+while SimCLR's contrastive pretraining was the one job worth renting a GPU for — an AutoDL
+**RTX 4090 ×1**, where one epoch took 23 s. 💻
 
 ## 🗺️ The Journey
 
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
 | 1 | [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) | Transformer captioner: multi-head attention, positional encodings, train on COCO 🤖 + a small Vision Transformer on CIFAR-10 👁️ | ✅ |
-| 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | 🟨 GPU TBD 🔜 |
+| 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | ✅ |
 | 3 | [`DDPM.ipynb`](DDPM.ipynb) | Text-conditioned diffusion: forward/reverse processes, U-Net, train or load pretrained ✨ | ✅ |
 | 4 | [`CLIPDINO.ipynb`](CLIPDINO.ipynb) | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ✅ |
 
@@ -37,7 +38,8 @@ pretraining is the part that really wants a GPU.
 
 **Contrastive learning: the batch *is* the negative sampler** 🧲
 - InfoNCE only compares in-batch neighbours, so N pairs give just 2(N−1) negatives per anchor — the reason CLIP used batch 32k and SimCLR 4k+, and why MoCo / BYOL / DINO / SigLIP exist at all
-- The SimCLR code matched the reference keys at the float32 floor (augmentation error **0**, losses ≤ **5.7e-8**) — but `sim_positive_pairs` had to return **N×1**: the key file stores `answers['sim']` as `(2, 1)`, and `(N,)` silently broadcasts into a wrong comparison 🔬
+- The payoff, measured on a rented GPU: one extra pretraining epoch pushed the kNN eval to **83.54%** top-1, and a linear probe on the frozen features reached **82.40%** test top-1 versus **15.28%** for the same probe on a from-scratch backbone — **+67 points** with only 10% of the labels 🚀
+- The code matched the reference keys at the float32 floor (augmentation error **0**, losses ≤ **5.7e-8**) — but `sim_positive_pairs` had to return **N×1**: the key file stores `answers['sim']` as `(2, 1)`, and `(N,)` silently broadcasts into a wrong comparison 🔬
 
 **Diffusion: the network only ever learns to denoise one step** 🌀
 - The forward process is closed-form, so training collapses to an MSE against whatever the net predicts — I implemented both directions (`pred_noise` ↔ `pred_x_start`) 🎯
@@ -65,16 +67,16 @@ pretraining is the part that really wants a GPU.
 | CLIP zero-shot | **9/10** sample images land on the expected class (the miss is a 5e-5 tie) | ✅ |
 | CLIP retrieval | text → image search: "sports" → tennis + skateboard, "black and white" → bathroom + zebras | ✅ |
 | DINO one-shot segmentation | bars: >0.45 / >0.50 / >0.55 mean IoU from a single annotated frame — got **0.484 / 0.560 / 0.645** | ✅ |
-| SimCLR + linear probe | bar: ≥ 70% top-1 with the pretrained backbone — **not trained yet** ⏳ | 🔜 |
+| SimCLR + linear probe | bar: ≥ 70% top-1 with the pretrained backbone — got **82.40%** vs **15.28%** for the from-scratch baseline, plus **83.54%** top-1 from the kNN eval after 1 pretraining epoch (AutoDL **RTX 4090 ×1**) | ✅ |
 
 ## 🛩️ Blast off
 
 1. `conda activate cs231n` 🐍
 2. Open this folder in VS Code (or `cd assignment3 && jupyter notebook`).
 3. Run the **first cell** of each notebook — it locates `cs231n` and pulls in that notebook's data; the weights (SimCLR 99 MB → CLIP 338 MB) and DAVIS (794 MB) download themselves on first use, so the first run is slow and the rest are seconds. ⬇️
-4. Only SimCLR's training cells really want a GPU — the ViT, DDPM and DINO runs all finished on CPU. ⏳
+4. The only job worth a GPU was SimCLR's pretraining — everything else finished on CPU. It ran on an AutoDL **RTX 4090 ×1** (23 s per epoch). Now everything is done. 🏁
 
-> 💻 3 of 4 notebooks ran **locally, no GPU rental** — ViT **0.5124** test accuracy, DDPM emojis in ~3 s per prompt, DINO one-shot segmentation **0.645** mean IoU. 🚀
+> 💻 Exercises 1, 3 and 4 ran **locally, no GPU rental** (ViT **0.5124** test accuracy, DDPM emojis in ~3 s per prompt, DINO one-shot segmentation **0.645** mean IoU), and exercise 2 ran on a rented AutoDL **RTX 4090 ×1**: a linear probe on SimCLR features jumped from **15.28%** to **82.40%** test top-1 with only 10% of the labels. 🚀
 
 ## 🗂️ Treasure map
 

@@ -14,7 +14,7 @@ For official course stuff (schedule, lectures, assignment overviews), check out 
 |---|------------|----------|
 | 1 | [Image Classification, kNN, Softmax, Fully-Connected Neural Network, Fully-Connected Nets 🔍](./assignment1/README.md) | ✅ **Completed** — 5/5 notebooks (hand-rolled NumPy: kNN → softmax → 2-layer net → deep FC nets, **56.6%** val 🏆) |
 | 2 | [Batch Normalization, Dropout, Convolutional Nets, Network Visualization, Image Captioning with RNNs 🧱](./assignment2/README.md) | ✅ **Completed** — 5/5 notebooks (hand-rolled BN/dropout/convs → PyTorch **88.8%** val 🏆) |
-| 3 | [Image Captioning with Transformers, Self-Supervised Learning, Diffusion Models, CLIP and DINO Models ✨](./assignment3/README.md) | 🟨 **In progress** — 3/4 notebooks + 1 code-complete (attention → ViT → diffusion → CLIP/DINO, **0.645** mean IoU one-shot segmentation 🏆; SimCLR training pending ⏳) |
+| 3 | [Image Captioning with Transformers, Self-Supervised Learning, Diffusion Models, CLIP and DINO Models ✨](./assignment3/README.md) | ✅ **Completed** — 4/4 notebooks (hand-rolled attention → ViT → diffusion → CLIP/DINO, plus SimCLR lifting a linear probe **15.3% → 82.4%** 🏆) |
 
 > 📖 Click any assignment name to open its README & directory map.
 
@@ -40,6 +40,7 @@ TL;DR: create & activate the env, then get coding! 🐍
 - **PyTorch 2.13** with **MPS** support on Apple Silicon 🍎⚡ (auto-falls back to CPU elsewhere)
 - **`imageio<3`** is pinned — the assignment code uses `from imageio import imread`, which was removed in imageio 3.x
 - **`tensorflow` + `tensorflow-datasets`** are only needed for the CLIP/DINO notebook (DAVIS video) — comment them out in `env.yml` if you don't need them
+- **One rented GPU**: the only job that needed one was assignment 3's SimCLR pretraining, run on AutoDL **RTX 4090 ×1** (23 s per epoch) — everything else is CPU-friendly 🎮
 
 ## 🤝 Study & Sharing Notes
 
