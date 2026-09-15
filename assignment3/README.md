@@ -1,6 +1,6 @@
 # ✨ Assignment 3 — Transformers, Self-Supervision & Generative Models
 
-> 🚦 **Status:** ✅🟨⬜⬜ **1 / 4 done + exercise 2 code-complete — GPU training still to go.** ⏳
+> 🚦 **Status:** ✅🟨✅⬜ **2 / 4 done + exercise 2 code-complete — only SimCLR's GPU training is left outstanding.** ⏳
 
 Modern deep learning in one assignment: **attention**, **self-supervised learning**, **diffusion**, and
 **vision-language models**. This is where the magic I've been reading about actually happens — and where
@@ -11,8 +11,8 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
 | 1 | [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) | Transformer captioner: multi-head attention, positional encodings, train on COCO 🤖 + a small Vision Transformer on CIFAR-10 👁️ | ✅ |
-| 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | 🟨 code ✅ · GPU training 🔜 |
-| 3 | [`DDPM.ipynb`](DDPM.ipynb) | Text-conditioned diffusion: forward/reverse processes, U-Net, train or load pretrained ✨ | ⬜ |
+| 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | 🟨 GPU TBD 🔜 |
+| 3 | [`DDPM.ipynb`](DDPM.ipynb) | Text-conditioned diffusion: forward/reverse processes, U-Net, train or load pretrained ✨ | ✅ |
 | 4 | [`CLIPDINO.ipynb`](CLIPDINO.ipynb) | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ⬜ |
 
 ## 🔑 Ideas I'm chasing
@@ -34,7 +34,8 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 | Vision Transformer on CIFAR-10 | > 0.45 test acc in 2 epochs — got **0.5124** (patch 4, lr 5e-4, wd 1e-4, bs 16, 6 layers); one-batch overfit **1.00** | ✅ |
 | SimCLR code (no training) | every sanity check passes — augmentation error **0**, sim / naive+vectorized loss errors ≤ **5.7e-8**, `train()` smoke-tested on 4 imgs (loss 1.667, weights really updated) | ✅ |
 | SimCLR + linear probe | ≥ 70% top-1 with the pretrained backbone vs a from-scratch baseline — **not run: GPU training deferred** ⏳ | 🔜 |
-| DDPM | recognizable generated emoji-images 🍀 | 🔜 |
+| DDPM sanity checks | q_sample error **0.0**, the two `predict_*` helpers **≤1.9e-6**, Unet forward **7.9e-6**, p_losses **7.4e-7**, p_sample **≤1.4e-6**, CFG **8.6e-5** (all float32 rounding level) | ✅ |
+| DDPM emoji generation 🍀 | pretrained 12.4M-param UNet sampled on **CPU** in ~3 s per 100 steps — flatness **0.22** (real emojis 0.19, pure noise 0.61) and CLIP ranks "face with cowboy hat" top-1 for all 5 samples | ✅ |
 | CLIP zero-shot | sensible top-1 classes on the probe set | 🔜 |
 
 ## 🛩️ Blast off
@@ -46,8 +47,9 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 5. [`CLIPDINO.ipynb`](CLIPDINO.ipynb) needs `tensorflow` + `tensorflow-datasets` (DAVIS video) — already in the env. 🎥
 6. In [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) the only heavy cell is the last one — a 2-epoch ViT on the full CIFAR-10, a few minutes on CPU, and it uses `cuda` automatically when there is one. ⏳
 7. [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb)'s training cells still hard-code `device='cuda'`; before running them locally, swap those for the notebook's `device` variable (otherwise they only run on a CUDA box). 🔧
+8. [`DDPM.ipynb`](DDPM.ipynb) needs no GPU at all — the 12.4M-parameter UNet samples 5 emojis in ~3 s per prompt on plain CPU, and it runs off the pretrained 149 MB checkpoint (auto-downloaded) rather than training. Its Colab-era `!pip install …/CLIP.git` cell is now an `import clip` check, since CLIP already lives in the env. ✨
 
-> 💻 Only the transformer notebook has been run **locally, no GPU rental** — the ViT still cleared the bar at **0.5124** test accuracy. ⏳ The SimCLR code is done and passes every sanity check, but its 1-epoch pretrain + linear-probe runs **have not happened yet**; DDPM and CLIP/DINO aren't started either. Nothing below exercise 1 has any real GPU training behind it — next stop: a rented GPU box (e.g. AutoDL), the repo is local-ready. 🚀
+> 💻 Exercises 1 and 3 both ran **locally, no GPU rental** — the ViT cleared the bar at **0.5124** test accuracy, and DDPM generated emoji faces in ~3 seconds per prompt on plain CPU. ⏳ Exercise 2's SimCLR fine-tuning is the one piece still waiting for a GPU (its code passes every sanity check), and exercise 4 hasn't been started. Next stop: a rented GPU box (e.g. AutoDL) — the repo is already local-ready. 🚀
 
 ## 🗂️ Treasure map
 

@@ -14,7 +14,7 @@ For official course stuff (schedule, lectures, assignment overviews), check out 
 |---|------------|----------|
 | 1 | [Image Classification, kNN, Softmax, Fully-Connected Neural Network, Fully-Connected Nets 🔍](./assignment1/README.md) | ✅ **Completed** — 5/5 notebooks (hand-rolled NumPy: kNN → softmax → 2-layer net → deep FC nets, **56.6%** val 🏆) |
 | 2 | [Batch Normalization, Dropout, Convolutional Nets, Network Visualization, Image Captioning with RNNs 🧱](./assignment2/README.md) | ✅ **Completed** — 5/5 notebooks (hand-rolled BN/dropout/convs → PyTorch **88.8%** val 🏆) |
-| 3 | [Image Captioning with Transformers, Self-Supervised Learning, Diffusion Models, CLIP and DINO Models ✨](./assignment3/README.md) | 🟨 **In progress** — 1/4 done + 1 code-complete (transformers + ViT **0.5124** test 🏆; SimCLR code ✅, GPU training still pending ⏳) |
+| 3 | [Image Captioning with Transformers, Self-Supervised Learning, Diffusion Models, CLIP and DINO Models ✨](./assignment3/README.md) | 🟨 **In progress** — 2/4 done + 1 code-complete (transformers + ViT **0.5124** test 🏆, DDPM emoji generation ✅ on CPU; SimCLR code ✅, GPU training still pending ⏳) |
 
 > 📖 Click any assignment name to open its README & directory map.
 
