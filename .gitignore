@@ -14,6 +14,7 @@ assignment3/data/
 assignment3/pretrained_model/
 assignment3/cs231n/exp/
 assignment3/results/
+assignment3/dino_res.mp4
 
 # submission build artifacts
 assignment*/cs231n/saved/

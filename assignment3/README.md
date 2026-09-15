@@ -1,10 +1,11 @@
 # ✨ Assignment 3 — Transformers, Self-Supervision & Generative Models
 
-> 🚦 **Status:** ✅🟨✅⬜ **2 / 4 done + exercise 2 code-complete — only SimCLR's GPU training is left outstanding.** ⏳
+> 🚦 **Status:** ✅🟨✅✅ **3 / 4 done + exercise 2 code-complete — only the SimCLR training runs are left.** ⏳
 
 Modern deep learning in one assignment: **attention**, **self-supervised learning**, **diffusion**, and
-**vision-language models**. This is where the magic I've been reading about actually happens — and where
-my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
+**vision-language models**. This is where the magic I've been reading about actually happens. 🥵 The good
+news: attention, diffusion and CLIP/DINO all ran **locally on CPU** — only SimCLR's contrastive
+pretraining is the part that really wants a GPU.
 
 ## 🗺️ The Journey
 
@@ -13,7 +14,7 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 | 1 | [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) | Transformer captioner: multi-head attention, positional encodings, train on COCO 🤖 + a small Vision Transformer on CIFAR-10 👁️ | ✅ |
 | 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | 🟨 GPU TBD 🔜 |
 | 3 | [`DDPM.ipynb`](DDPM.ipynb) | Text-conditioned diffusion: forward/reverse processes, U-Net, train or load pretrained ✨ | ✅ |
-| 4 | [`CLIPDINO.ipynb`](CLIPDINO.ipynb) | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ⬜ |
+| 4 | [`CLIPDINO.ipynb`](CLIPDINO.ipynb) | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ✅ |
 
 ## 🔑 Ideas I'm chasing
 
@@ -24,32 +25,56 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 
 ## 💭 Notes & takeaways
 
-*(To be written as I go — e.g. why SimCLR wants a big batch, what the temperature does in the contrastive loss.)*
+**Attention is a soft, learned lookup — and the mask polarity is a trap** 🤖
+- Multi-head means several independent `d/h` subspaces, so heads can specialise (short-range vs long-range); the output projection is the only place the heads actually talk to each other 🎯
+- `attn_mask` means "**True = keep**": masking the `True` entries instead gave a masked-attention error of **0.575**, while `masked_fill(~mask, -1e9)` gave **9.7e-5** 🩹 — hence the captioner's causal mask is `torch.tril(ones)`, not `tril == 0` 🔒
+- `-1e9` rather than `-inf` on purpose: a fully masked row degrades to uniform instead of NaN
+
+**Transformer captioner: causal masking is the whole trick** 🖼️➡️💬
+- 50 images, 2 layers: loss **5.05 → 0.0225** in 100 epochs (bar < 0.05) while the decoder sees the whole caption at once — hiding every future step is what makes that a legal signal
+- Vision Transformer on CIFAR-10: **0.5124** test accuracy in 2 epochs (bar 0.45) 📈
+- In a 2-epoch budget patches beat capacity: 4×4 patches (64 tokens) > 8×8 (16 tokens) by ~2 points, while a wider hidden dim or FFN made it *worse* (0.35 / 0.32 vs 0.41) ⚖️
+
+**Contrastive learning: the batch *is* the negative sampler** 🧲
+- InfoNCE only compares in-batch neighbours, so N pairs give just 2(N−1) negatives per anchor — the reason CLIP used batch 32k and SimCLR 4k+, and why MoCo / BYOL / DINO / SigLIP exist at all
+- The SimCLR code matched the reference keys at the float32 floor (augmentation error **0**, losses ≤ **5.7e-8**) — but `sim_positive_pairs` had to return **N×1**: the key file stores `answers['sim']` as `(2, 1)`, and `(N,)` silently broadcasts into a wrong comparison 🔬
+
+**Diffusion: the network only ever learns to denoise one step** 🌀
+- The forward process is closed-form, so training collapses to an MSE against whatever the net predicts — I implemented both directions (`pred_noise` ↔ `pred_x_start`) 🎯
+- Structure is pinned by arithmetic: the U-Net's exact parameter count (**6,499** toy / **12.4 M** real) plus a strict `load_state_dict` of the pretrained checkpoint
+- Sampling is cheap (**~3 s** for 100 steps × 5 images on CPU) and the text conditioning is real: generations have emoji-like statistics and CLIP ranks the prompt top-1 for all 5 samples 🎩
+
+**CLIP and DINO: alignment is not localization** 🎥
+- CLIP's zero-shot path is normalize → dot-product → argmax, and it works: retrieval returned tennis + skateboard for "sports" and bathroom + zebras for "black and white", with **9/10** zero-shot labels on target 🔎
+- DINO's one-shot segmentation was the surprise: a 2-layer MLP trained on the patches of **one** annotated frame reached IoU **0.484 / 0.560 / 0.645** (bars 0.45 / 0.50 / 0.55) 🏆
+- Why it works is measurable: neighbouring patch embeddings score **0.83** cosine similarity vs **0.47** for random pairs, so PCA-over-features paints object-shaped regions — a free segmentation 👁️
+- CLIP optimises the *pooled* token for caption matching, DINO makes two crops of one object agree; for per-patch tasks that difference is everything 🧭
+
+**Craft tips** 🔧
+- Check the *absolute* difference before chasing a "failed" tolerance: three checks here were float32 rounding at the 1e-6 level ❌➡️✅
+- Structural invariants (exact parameter counts, dimension assertions, strict checkpoint loads) are the real tests
+- Local-first works, but the plumbing is what breaks: `pip install git+…` times out, `tfds` wanted a missing `importlib_resources`, `device='cuda'` was hard-coded — all now "install only if missing" or device-agnostic 💻
 
 ## 📊 Scoreboard
 
 | Exercise | Target / result | Got? |
 |----------|-----------------|------|
-| Transformer captioning | loss dropping + readable captions — overfit 50 imgs to **0.0225**, every layer test within tolerance | ✅ |
-| Vision Transformer on CIFAR-10 | > 0.45 test acc in 2 epochs — got **0.5124** (patch 4, lr 5e-4, wd 1e-4, bs 16, 6 layers); one-batch overfit **1.00** | ✅ |
-| SimCLR code (no training) | every sanity check passes — augmentation error **0**, sim / naive+vectorized loss errors ≤ **5.7e-8**, `train()` smoke-tested on 4 imgs (loss 1.667, weights really updated) | ✅ |
-| SimCLR + linear probe | ≥ 70% top-1 with the pretrained backbone vs a from-scratch baseline — **not run: GPU training deferred** ⏳ | 🔜 |
-| DDPM sanity checks | q_sample error **0.0**, the two `predict_*` helpers **≤1.9e-6**, Unet forward **7.9e-6**, p_losses **7.4e-7**, p_sample **≤1.4e-6**, CFG **8.6e-5** (all float32 rounding level) | ✅ |
-| DDPM emoji generation 🍀 | pretrained 12.4M-param UNet sampled on **CPU** in ~3 s per 100 steps — flatness **0.22** (real emojis 0.19, pure noise 0.61) and CLIP ranks "face with cowboy hat" top-1 for all 5 samples | ✅ |
-| CLIP zero-shot | sensible top-1 classes on the probe set | 🔜 |
+| Transformer captioning | bar: loss < 0.05 when overfitting 50 images — reached **0.0225** in 100 epochs | ✅ |
+| Vision Transformer on CIFAR-10 | bar: > 0.45 test acc after 2 epochs — got **0.5124** (patch 4, lr 5e-4, wd 1e-4, bs 16, 6 layers) | ✅ |
+| DDPM emoji generation | text-conditioned emoji faces from the pretrained U-Net — **~3 s** per 100-step sample on CPU | ✅ |
+| CLIP zero-shot | **9/10** sample images land on the expected class (the miss is a 5e-5 tie) | ✅ |
+| CLIP retrieval | text → image search: "sports" → tennis + skateboard, "black and white" → bathroom + zebras | ✅ |
+| DINO one-shot segmentation | bars: >0.45 / >0.50 / >0.55 mean IoU from a single annotated frame — got **0.484 / 0.560 / 0.645** | ✅ |
+| SimCLR + linear probe | bar: ≥ 70% top-1 with the pretrained backbone — **not trained yet** ⏳ | 🔜 |
 
 ## 🛩️ Blast off
 
 1. `conda activate cs231n` 🐍
 2. Open this folder in VS Code (or `cd assignment3 && jupyter notebook`).
-3. Run the **first cell** — COCO / imagenet_val / emoji datasets auto-download as needed. ⬇️
-4. Pretrained weights (SimCLR, DDPM) fetch themselves on first use. 🤖
-5. [`CLIPDINO.ipynb`](CLIPDINO.ipynb) needs `tensorflow` + `tensorflow-datasets` (DAVIS video) — already in the env. 🎥
-6. In [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) the only heavy cell is the last one — a 2-epoch ViT on the full CIFAR-10, a few minutes on CPU, and it uses `cuda` automatically when there is one. ⏳
-7. [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb)'s training cells still hard-code `device='cuda'`; before running them locally, swap those for the notebook's `device` variable (otherwise they only run on a CUDA box). 🔧
-8. [`DDPM.ipynb`](DDPM.ipynb) needs no GPU at all — the 12.4M-parameter UNet samples 5 emojis in ~3 s per prompt on plain CPU, and it runs off the pretrained 149 MB checkpoint (auto-downloaded) rather than training. Its Colab-era `!pip install …/CLIP.git` cell is now an `import clip` check, since CLIP already lives in the env. ✨
+3. Run the **first cell** of each notebook — it locates `cs231n` and pulls in that notebook's data; the weights (SimCLR 99 MB → CLIP 338 MB) and DAVIS (794 MB) download themselves on first use, so the first run is slow and the rest are seconds. ⬇️
+4. Only SimCLR's training cells really want a GPU — the ViT, DDPM and DINO runs all finished on CPU. ⏳
 
-> 💻 Exercises 1 and 3 both ran **locally, no GPU rental** — the ViT cleared the bar at **0.5124** test accuracy, and DDPM generated emoji faces in ~3 seconds per prompt on plain CPU. ⏳ Exercise 2's SimCLR fine-tuning is the one piece still waiting for a GPU (its code passes every sanity check), and exercise 4 hasn't been started. Next stop: a rented GPU box (e.g. AutoDL) — the repo is already local-ready. 🚀
+> 💻 3 of 4 notebooks ran **locally, no GPU rental** — ViT **0.5124** test accuracy, DDPM emojis in ~3 s per prompt, DINO one-shot segmentation **0.645** mean IoU. 🚀
 
 ## 🗂️ Treasure map
 
@@ -63,9 +88,9 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 | [`cs231n/gaussian_diffusion.py`](cs231n/gaussian_diffusion.py) | the diffusion math 🌀 |
 | [`cs231n/unet.py`](cs231n/unet.py) | the denoising U-Net |
 | [`cs231n/ddpm_trainer.py`](cs231n/ddpm_trainer.py) | DDPM training + pretrained loader |
-| [`cs231n/clip_dino.py`](cs231n/clip_dino.py) | CLIP/DINO helpers (+ TFDS for DAVIS) 🎥 |
+| [`cs231n/clip_dino.py`](cs231n/clip_dino.py) | CLIP similarity / zero-shot / retrieval + DINO attention, PCA and DAVIS one-shot segmentation 🎥 |
 | [`cs231n/coco_utils.py`](cs231n/coco_utils.py) | COCO loader |
-| `data/`, `pretrained_model/` | where datasets & weights land (local, git-ignored) ⬇️ |
+| `data/`, `pretrained_model/` | where datasets & weights land (local, git-ignored); DAVIS goes to `~/tensorflow_datasets` ⬇️ |
 | [`collect_submission.ipynb`](collect_submission.ipynb) | 📦 zip + PDF for submission |
 
 > ⚠️ Ignore [`requirements.txt`](requirements.txt) — it's Colab-era and outdated; use the repo-level [`env.yml`](../env.yml).
