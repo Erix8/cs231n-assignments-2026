@@ -88,7 +88,22 @@ class CaptioningTransformer(nn.Module):
         #  3) Finally, apply the decoder features on the text & image embeddings   #
         #     along with the tgt_mask. Project the output to scores per token      #
         ############################################################################
+        # 1) Word embeddings plus positional encoding, of shape (N, T, W).
+        tgt = self.embedding(captions)
+        tgt = self.positional_encoding(tgt)
 
+        # Project the image features into the same dimension, and treat them as a
+        # memory sequence of length 1: (N, D) -> (N, 1, W).
+        memory = self.visual_projection(features).unsqueeze(1)
+
+        # 2) Causal mask of shape (T, T): position i is allowed to attend to
+        #    position j only when j <= i, i.e. mask[i, j] is True on and below
+        #    the diagonal (True means "keep" in MultiHeadAttention).
+        tgt_mask = torch.tril(torch.ones(T, T)).bool()
+
+        # 3) Decoder, then project to vocabulary scores.
+        tgt = self.transformer(tgt, memory, tgt_mask=tgt_mask)
+        scores = self.output(tgt)
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -240,7 +255,20 @@ class VisionTransformer(nn.Module):
         #    You may find torch.mean useful.                                      #
         # 5. Feed it through a linear layer to produce class logits.              #
         ############################################################################
+        # 1. (N, C, H, W) -> (N, num_patches, embed_dim)
+        x = self.patch_embed(x)
 
+        # 2. Add the sinusoidal positional encoding to keep spatial information.
+        x = self.positional_encoding(x)
+
+        # 3. Sequence of patch vectors through the transformer encoder.
+        x = self.transformer(x)
+
+        # 4. Average-pool the patch vectors into one feature per image.
+        x = torch.mean(x, dim=1)
+
+        # 5. Class logits.
+        logits = self.head(x)
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
