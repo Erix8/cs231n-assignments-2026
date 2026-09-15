@@ -1,6 +1,6 @@
 # ✨ Assignment 3 — Transformers, Self-Supervision & Generative Models
 
-> 🚦 **Status:** ✅⬜⬜⬜ **1 / 4 — transformers done, three to go.** 🚧
+> 🚦 **Status:** ✅🟨⬜⬜ **1 / 4 done + exercise 2 code-complete — GPU training still to go.** ⏳
 
 Modern deep learning in one assignment: **attention**, **self-supervised learning**, **diffusion**, and
 **vision-language models**. This is where the magic I've been reading about actually happens — and where
@@ -11,7 +11,7 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 | # | Exercise | What I'll implement 🛠️ | Status |
 |---|----------|------------------------|--------|
 | 1 | [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) | Transformer captioner: multi-head attention, positional encodings, train on COCO 🤖 + a small Vision Transformer on CIFAR-10 👁️ | ✅ |
-| 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | ⬜ |
+| 2 | [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb) | SimCLR: contrastive pretraining → linear probe, with a provided backbone 🧊 | 🟨 code ✅ · GPU training 🔜 |
 | 3 | [`DDPM.ipynb`](DDPM.ipynb) | Text-conditioned diffusion: forward/reverse processes, U-Net, train or load pretrained ✨ | ⬜ |
 | 4 | [`CLIPDINO.ipynb`](CLIPDINO.ipynb) | CLIP zero-shot classification + DINO features, video object tracking on DAVIS 🎥 | ⬜ |
 
@@ -32,7 +32,8 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 |----------|-----------------|------|
 | Transformer captioning | loss dropping + readable captions — overfit 50 imgs to **0.0225**, every layer test within tolerance | ✅ |
 | Vision Transformer on CIFAR-10 | > 0.45 test acc in 2 epochs — got **0.5124** (patch 4, lr 5e-4, wd 1e-4, bs 16, 6 layers); one-batch overfit **1.00** | ✅ |
-| SimCLR linear probe | solid accuracy with the pretrained backbone | 🔜 |
+| SimCLR code (no training) | every sanity check passes — augmentation error **0**, sim / naive+vectorized loss errors ≤ **5.7e-8**, `train()` smoke-tested on 4 imgs (loss 1.667, weights really updated) | ✅ |
+| SimCLR + linear probe | ≥ 70% top-1 with the pretrained backbone vs a from-scratch baseline — **not run: GPU training deferred** ⏳ | 🔜 |
 | DDPM | recognizable generated emoji-images 🍀 | 🔜 |
 | CLIP zero-shot | sensible top-1 classes on the probe set | 🔜 |
 
@@ -44,8 +45,9 @@ my laptop starts sweating. 🥵 GPU recommended, patience mandatory.
 4. Pretrained weights (SimCLR, DDPM) fetch themselves on first use. 🤖
 5. [`CLIPDINO.ipynb`](CLIPDINO.ipynb) needs `tensorflow` + `tensorflow-datasets` (DAVIS video) — already in the env. 🎥
 6. In [`TransformerCaptioning.ipynb`](TransformerCaptioning.ipynb) the only heavy cell is the last one — a 2-epoch ViT on the full CIFAR-10, a few minutes on CPU, and it uses `cuda` automatically when there is one. ⏳
+7. [`SelfSupervisedLearning.ipynb`](SelfSupervisedLearning.ipynb)'s training cells still hard-code `device='cuda'`; before running them locally, swap those for the notebook's `device` variable (otherwise they only run on a CUDA box). 🔧
 
-> 💻 The transformer notebook ran **locally, no GPU rental** — the ViT still cleared the bar at **0.5124** test accuracy. The heavy stuff is still ahead: DDPM and SimCLR really want a GPU; on a Mac, `mps` helps, and for DDPM just `git clone` this repo onto a rented GPU box (e.g. AutoDL) — everything is local-ready. 🚀
+> 💻 Only the transformer notebook has been run **locally, no GPU rental** — the ViT still cleared the bar at **0.5124** test accuracy. ⏳ The SimCLR code is done and passes every sanity check, but its 1-epoch pretrain + linear-probe runs **have not happened yet**; DDPM and CLIP/DINO aren't started either. Nothing below exercise 1 has any real GPU training behind it — next stop: a rented GPU box (e.g. AutoDL), the repo is local-ready. 🚀
 
 ## 🗂️ Treasure map
 
